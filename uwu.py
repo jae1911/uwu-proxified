@@ -13,7 +13,7 @@ redis_host = environ.get("REDIS_HOST", "localhost")
 redis_port = environ.get("REDIS_PORT", 6379)
 
 # Random stuff
-img_ext = ["png", "jpeg", "jpg", "webp"]
+img_ext = ["png", "jpeg", "jpg", "webp", "gif"]
 vid_ext = ["mp4", "webm"]
 
 # App
