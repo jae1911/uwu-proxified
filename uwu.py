@@ -3,7 +3,7 @@ from pickle import dumps, loads
 from io import BytesIO
 from json import loads
 
-from flask import Flask, jsonify, send_file
+from flask import Flask, jsonify, stream_with_context, Response
 from requests import get
 from redis import Redis
 
@@ -11,10 +11,6 @@ from redis import Redis
 site_baseurl = environ.get("SITE_BASE_DOMAIN", "https://e621.net")
 redis_host = environ.get("REDIS_HOST", "localhost")
 redis_port = environ.get("REDIS_PORT", 6379)
-
-# Random stuff
-img_ext = ["png", "jpeg", "jpg", "webp", "gif"]
-vid_ext = ["mp4", "webm"]
 
 # App
 app = Flask(__name__)
@@ -67,21 +63,6 @@ def hit_api_and_store(id):
     return post.json()
 
 
-def build_mime_type(uri):
-    extension = path.splitext(uri)[1].replace(".", "")
-
-    final_mime = None
-
-    if extension in img_ext:
-        final_mime = f"image/{extension}"
-    elif extension in vid_ext:
-        final_mime = f"video/{extension}"
-    else:
-        final_mime = "nonstandard/unknown"
-
-    return final_mime
-
-
 @app.route("/")
 def index_route():
     return "ok", 200
@@ -107,10 +88,9 @@ def proxy_image_route(id):
     if not post["post"]["file"]["url"]:
         return jsonify({"err": "none"}), 404
 
-    img = get(post["post"]["file"]["url"], headers=api_headers)
-    buffer_image = BytesIO(img.content)
-    buffer_image.seek(0)
+    content = get(post["post"]["file"]["url"], headers=api_headers, stream=True)
 
-    mime = build_mime_type(post["post"]["file"]["url"])
-
-    return send_file(buffer_image, mimetype=mime)
+    return Response(
+        stream_with_context(content.iter_content(chunk_size=1024)),
+        content_type=content.headers["content-type"],
+    )
