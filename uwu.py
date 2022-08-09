@@ -65,7 +65,10 @@ def hit_api_and_store(id):
 
 @app.route("/")
 def index_route():
-    return "ok; powered by https://github.com/jae1911/uwu-proxified", 200
+    return (
+        f"ok; powered by https://github.com/jae1911/uwu-proxified<br>currently proxying: {site_baseurl}",
+        200,
+    )
 
 
 @app.route("/proxy/api/post/<id>")
