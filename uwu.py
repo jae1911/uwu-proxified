@@ -1,4 +1,4 @@
-from os import environ
+from os import environ, path
 from pickle import dumps, loads
 from io import BytesIO
 from json import loads
@@ -12,6 +12,11 @@ site_baseurl = environ.get("SITE_BASE_DOMAIN", "https://e621.net")
 redis_host = environ.get("REDIS_HOST", "localhost")
 redis_port = environ.get("REDIS_PORT", 6379)
 
+# Random stuff
+img_ext = ["png", "jpeg", "jpg", "webp"]
+vid_ext = ["mp4", "webm"]
+
+# App
 app = Flask(__name__)
 api_headers = {"User-Agent": "UwUProxy/1.0 (by jae1911 on GitHub)"}
 redis = Redis(host=redis_host, port=redis_port)
@@ -62,6 +67,21 @@ def hit_api_and_store(id):
     return post.json()
 
 
+def build_mime_type(uri):
+    extension = path.splitext(uri)[1].replace(".", "")
+
+    final_mime = None
+
+    if extension in img_ext:
+        final_mime = f"image/{extension}"
+    elif extension in vid_ext:
+        final_mime = f"video/{extension}"
+    else:
+        final_mime = "nonstandard/unknown"
+
+    return final_mime
+
+
 @app.route("/")
 def index_route():
     return "ok", 200
@@ -91,4 +111,6 @@ def proxy_image_route(id):
     buffer_image = BytesIO(img.content)
     buffer_image.seek(0)
 
-    return send_file(buffer_image, mimetype="image/png")
+    mime = build_mime_type(post["post"]["file"]["url"])
+
+    return send_file(buffer_image, mimetype=mime)
