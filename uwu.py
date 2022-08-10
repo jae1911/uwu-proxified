@@ -3,7 +3,7 @@ from pickle import dumps, loads
 from io import BytesIO
 from json import loads
 
-from flask import Flask, jsonify, stream_with_context, Response
+from flask import Flask, jsonify, stream_with_context, Response, render_template
 from requests import get
 from redis import Redis
 
@@ -11,6 +11,10 @@ from redis import Redis
 site_baseurl = environ.get("SITE_BASE_DOMAIN", "https://e621.net")
 redis_host = environ.get("REDIS_HOST", "localhost")
 redis_port = environ.get("REDIS_PORT", 6379)
+
+# Random unoptimized stuff
+img_exts = ["jpeg", "jpg", "png", "gif"]
+vid_exts = ["mp4", "webm"]
 
 # App
 app = Flask(__name__)
@@ -97,4 +101,22 @@ def proxy_image_route(id):
     return Response(
         stream_with_context(content.iter_content(chunk_size=1024)),
         content_type=content.headers["content-type"],
+    )
+
+
+@app.route("/post/<id>")
+def proxy_post_route(id):
+    if not id or not id.isnumeric():
+        return render_template("404.html")
+
+    post_data = hit_api_and_store(id)["post"]
+
+    post_content_ext = post_data["file"]["ext"]
+
+    kind = "image"
+    if post_content_ext in vid_exts:
+        kind = "video"
+
+    return render_template(
+        "post.html", id=id, description=post_data["description"], kind=kind
     )
