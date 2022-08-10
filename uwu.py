@@ -15,6 +15,7 @@ redis_port = environ.get("REDIS_PORT", 6379)
 # Random unoptimized stuff
 img_exts = ["jpeg", "jpg", "png", "gif"]
 vid_exts = ["mp4", "webm"]
+accepted_types = ["posts", "pools", "blips", "post_sets", "artists"]
 
 # App
 app = Flask(__name__)
@@ -75,17 +76,6 @@ def index_route():
     )
 
 
-@app.route("/proxy/api/<type>/<id>")  # Default UwU API
-@app.route("/<type>/<id>.json")  # E6-style API
-def proxy_api_route(type, id):
-    if not id or not id.isnumeric():
-        return jsonify({"err": "none"}), 404
-
-    res = hit_api_and_store(id, type)
-
-    return jsonify(res), 200
-
-
 @app.route("/proxy/img/<id>")
 def proxy_image_route(id):
     if not id or not id.isnumeric():
@@ -104,12 +94,22 @@ def proxy_image_route(id):
     )
 
 
-@app.route("/post/<id>")
-def proxy_post_route(id):
-    if not id or not id.isnumeric():
+@app.route("/<type>/<id>")  # E6 Parity
+def proxy_post_route(type, id):
+    if not id or not type in accepted_types:
+        return render_template("404.html")
+    elif not id.isnumeric():
+        # For E6-like API URIs
+        if ".json" in id and id.replace(".json", "").isnumeric():
+            res = hit_api_and_store(id.replace(".json", ""), type)
+            return jsonify(res), 200
+
         return render_template("404.html")
 
-    post_data = hit_api_and_store(id)["post"]
+    if type != "post":
+        return "Display not implemented yet", 501
+
+    post_data = hit_api_and_store(id, type)["post"]
 
     post_content_ext = post_data["file"]["ext"]
 
