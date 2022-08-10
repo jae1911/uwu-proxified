@@ -69,3 +69,7 @@ a {
       color: #212121;
   }
 }
+
+blockquote {
+    font-style: italic;
+}
