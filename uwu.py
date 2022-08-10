@@ -106,7 +106,7 @@ def proxy_post_route(type, id):
 
         return render_template("404.html")
 
-    if type != "post":
+    if type != "posts":
         return "Display not implemented yet", 501
 
     post_data = hit_api_and_store(id, type)["post"]
