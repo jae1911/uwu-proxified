@@ -1,0 +1,71 @@
+body {
+  font-family: sans-serif;
+}
+
+.formatted {
+  font-family: monospace;
+}
+
+.lewd {
+  background-color: palevioletred;
+  color: white;
+  text-transform: uppercase;
+}
+
+.container {
+  margin: auto;
+  width: 100%;
+  max-width: 1000px;
+  border: 3px solid green;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.column {
+  float: left;
+  width: 50%;
+}
+
+.column ul {
+  list-style: none;
+}
+
+h1, h2, h3 {
+  text-align: center;
+}
+
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+h1 {
+  text-align: center;
+}
+
+p {
+  text-align: justify;
+}
+
+.centered {
+  text-align: center;
+}
+
+/* Dark Mode */
+
+body {
+  background-color: #212121;
+  color: #fff;
+}
+
+a {
+  color: #468847
+}
+
+@media screen and (prefers-color-scheme: light) {
+  body {
+      background-color: #FFF;
+      color: #212121;
+  }
+}
