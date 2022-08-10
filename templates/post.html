@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Post #{{ id }}{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  <blockquote>{{ description }}</blockquote>
+  {% if kind == "image" %}
+    <img src="/proxy/img/{{id}}" width="500px">
+  {% else %}
+    <video controls="controls" src="/proxy/img/{{id}}" width="500px" loop></video>
+  {% endif %}
+{% endblock %}
