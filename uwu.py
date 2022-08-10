@@ -43,14 +43,14 @@ def get_val(key, default=None):
         return default
 
 
-def hit_api_and_store(id):
-    cache_key = f"post_{id}"
+def hit_api_and_store(id, type="posts"):
+    cache_key = f"{type}_{id}"
 
     cached_result = get_val(cache_key)
     if cached_result:
         return cached_result
 
-    built_uri = f"{site_baseurl}/posts/{id}.json"
+    built_uri = f"{site_baseurl}/{type}/{id}.json"
 
     post = get(built_uri, headers=api_headers)
 
@@ -71,12 +71,13 @@ def index_route():
     )
 
 
-@app.route("/proxy/api/post/<id>")
-def proxy_api_route(id):
+@app.route("/proxy/api/<type>/<id>")  # Default UwU API
+@app.route("/<type>/<id>.json")  # E6-style API
+def proxy_api_route(type, id):
     if not id or not id.isnumeric():
         return jsonify({"err": "none"}), 404
 
-    res = hit_api_and_store(id)
+    res = hit_api_and_store(id, type)
 
     return jsonify(res), 200
 
