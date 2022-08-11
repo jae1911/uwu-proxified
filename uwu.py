@@ -106,17 +106,23 @@ def proxy_post_route(type, id):
 
         return render_template("404.html")
 
-    if type != "posts":
+    if type == "posts":
+        post_data = hit_api_and_store(id, type)["post"]
+
+        post_content_ext = post_data["file"]["ext"]
+        post_tags_general = post_data["tags"]["general"]
+
+        kind = "image"
+        if post_content_ext in vid_exts:
+            kind = "video"
+
+        return render_template(
+            "post.html",
+            id=id,
+            description=post_data["description"],
+            kind=kind,
+            baseurl=site_baseurl,
+            post_tags_general=post_tags_general,
+        )
+    else:
         return "Display not implemented yet", 501
-
-    post_data = hit_api_and_store(id, type)["post"]
-
-    post_content_ext = post_data["file"]["ext"]
-
-    kind = "image"
-    if post_content_ext in vid_exts:
-        kind = "video"
-
-    return render_template(
-        "post.html", id=id, description=post_data["description"], kind=kind
-    )

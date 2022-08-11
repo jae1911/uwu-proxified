@@ -11,4 +11,13 @@
   {% else %}
     <video controls="controls" src="/proxy/img/{{id}}" width="500px" loop></video>
   {% endif %}
+  <br/>
+  <p>Tags:</p>
+  <ul>
+    {% for tag in post_tags_general %}
+      <li>{{tag}}</li>
+    {% endfor %}
+  </ul>
+  <br/>
+  <p><a href="{{baseurl}}/posts/{{id}}">View original on  {{baseurl}}</a></p>
 {% endblock %}
